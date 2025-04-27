@@ -42,20 +42,16 @@ def get_activity(request):
             if 'month' in request.data.keys():
                 month_requested = request.data['month']
                 try:
-                    activity_detail = Tracker.objects.raw(
-                        'Select * from health_tracker where month=%s' % month_requested)
+                    activity_detail = Tracker.objects.raw(raw_query='SELECT * FROM health_tracker WHERE month=%s',
+                                                          params=[month_requested])
                     final_serialized_data = []
                     for activity in activity_detail:
                         serializer = TrackerSerializers(activity)
                         final_serialized_data.append(serializer.data)
                     return Response(final_serialized_data)
+
                 except Tracker.DoesNotExist:
                     return Response(status=status.HTTP_404_NOT_FOUND)
-                except ValueError:
-                    cursor = connection.cursor()
-                    cursor.execute('Select * from health_tracker where month=%s' % month_requested)
-                    activity_detail = cursor.fetchall()
-                    return JsonResponse(activity_detail, safe=False)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
