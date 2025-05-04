@@ -9,7 +9,6 @@
 # This file is part of Tiredful API application
 
 from __future__ import unicode_literals
-from django.http import HttpResponse
 from django.shortcuts import render
 
 from intro.forms import LoginForm, LogoutForm

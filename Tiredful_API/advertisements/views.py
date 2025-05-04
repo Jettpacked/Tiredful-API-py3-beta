@@ -11,8 +11,6 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes

@@ -11,7 +11,6 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 from trains.models import Reservation
 from trains.serializers import ReservationSerializers
 

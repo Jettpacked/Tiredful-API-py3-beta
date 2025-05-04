@@ -11,7 +11,6 @@
 from rest_framework import serializers
 
 from trains.models import Reservation
-from django.contrib.auth.models import User
 
 
 # ScoreCard object serializer

@@ -11,8 +11,6 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render
-from django.db import connection
-from django.http import JsonResponse
 
 from rest_framework import status
 from rest_framework.decorators import api_view
