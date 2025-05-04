@@ -13,8 +13,9 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from health.models import Tracker
 from health.serializers import TrackerSerializers
@@ -31,16 +32,23 @@ def index(request):
 
 # get user activities
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
 def get_activity(request):
     """
-    Details of user activity monthwise
+    Fetch user activity month-wise with proper access control.
+    - Regular users can ONLY see their own data.
+    - Admins can see all health data.
     """
+
     if request.method == 'POST':
         if request.data:
             if 'month' in request.data.keys():
                 month_requested = request.data['month']
-                activity_detail = Tracker.objects.raw(raw_query='SELECT * FROM health_tracker WHERE month=%s',
-                                                      params=[month_requested])
+                if request.user.is_staff:  # Admins can access all records
+                    activity_detail = Tracker.objects.filter(month=month_requested)
+                else:  # Regular users only get their own records
+                    activity_detail = Tracker.objects.filter(month=month_requested, user=request.user)
+
                 final_serialized_data = []
                 for activity in activity_detail:
                     serializer = TrackerSerializers(activity)

@@ -19,9 +19,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
+from rest_framework.permissions import IsAuthenticated
 from blog.models import Article
 from blog.serializers import ArticleSerializer
-from blog.permissions import UserPermission
 
 
 # Index method for Blog article listing
@@ -35,7 +35,7 @@ def index(request):
 
 # Method to display article
 @api_view(['GET', 'PATCH', 'DELETE'])
-@permission_classes((UserPermission,))
+@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
 def article(request, article_id):
     """
     Display particular blog article, delete particular blog article, update blog article
@@ -52,14 +52,11 @@ def article(request, article_id):
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
     elif request.method == 'DELETE':
-        if 'HTTP_ISADMIN' in request.META:
-            if request.META['HTTP_ISADMIN'] == "True":
-                selected_article.delete()
-                return Response(json.dumps('Successfully deleted'))
-            else:
-                return Response(json.dumps('Invalid header value'))
+        if request.user.is_staff:
+            selected_article.delete()
+            return Response(json.dumps('Successfully deleted'))
         else:
-            return Response(json.dumps('IsAdmin header missing'))
+            return Response(status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'PATCH':
         selected_article.approval_status = True
         selected_article.save()
