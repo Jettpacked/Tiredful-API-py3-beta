@@ -41,17 +41,13 @@ def get_activity(request):
         if request.data:
             if 'month' in request.data.keys():
                 month_requested = request.data['month']
-                try:
-                    activity_detail = Tracker.objects.raw(raw_query='SELECT * FROM health_tracker WHERE month=%s',
-                                                          params=[month_requested])
-                    final_serialized_data = []
-                    for activity in activity_detail:
-                        serializer = TrackerSerializers(activity)
-                        final_serialized_data.append(serializer.data)
-                    return Response(final_serialized_data)
-
-                except Tracker.DoesNotExist:
-                    return Response(status=status.HTTP_404_NOT_FOUND)
+                activity_detail = Tracker.objects.raw(raw_query='SELECT * FROM health_tracker WHERE month=%s',
+                                                      params=[month_requested])
+                final_serialized_data = []
+                for activity in activity_detail:
+                    serializer = TrackerSerializers(activity)
+                    final_serialized_data.append(serializer.data)
+                return Response(final_serialized_data)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
